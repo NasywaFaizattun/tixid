@@ -104,7 +104,6 @@ class UserController extends Controller
 
     public function datatables()
     {
-
         $users = User::whereIn('role', ['admin', 'staff'])->get();
         return DataTables::of($users)
         ->addIndexColumn()

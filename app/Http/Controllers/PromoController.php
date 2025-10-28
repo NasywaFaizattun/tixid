@@ -22,6 +22,8 @@ class PromoController extends Controller
     public function datatables()
     {
 
+
+        
         $promos = Promo::query()->get();
         return DataTables::of($promos)
         ->addIndexColumn()
