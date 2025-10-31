@@ -14,6 +14,10 @@ Route::get('/schedules/{movie_id}', [MovieController::class, 'movieSchedule']
 )->name('schedule.detail');
 Route::get('/schedules/{scheduleId}/hours/{hourId}/ticket', [TicketController::class, 'showSeats'])->name('schedules.show_seats');
 
+// menu "bioskop" pada navbar user (pengguna umum)
+Route::get('/cinemas/list', [CinemaController::class, 'cinemaList'])->name('cinemas.list');
+Route::get('/cinemas/{cinema_id}/schedules', [CinemaController::class, 'cinemaSchedules'])->name('cinemas.schedules');
+
 Route::get('/login', function () {
     return view('auth.login');
 })->name('login');
