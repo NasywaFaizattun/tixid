@@ -171,6 +171,9 @@ class CinemaController extends Controller
 
     public function cinemaSchedules($cinema_id)
     {
+        // whereHas('namarelasi, function($q) {...}) : argumen 1 (nama relasi) wajib, argumen 2 (function untuk filter pada relasi) optional
+        // whereHas('namarelasi') -> Movie::whereHas('schedule') mengambil data film hanya yang memiliki relasi (memiliki data) scheedules
+        // whereHas('namarelasi', function($q) {...}) -> Schedule:whereHas('movie, function($q) { $q->where('actived', 1); }) mengaimbil data schedules hanya yang memiliki relasi (memiliki data) movie dan nilai actived pada movienya 1
         $schedules = Schedule::where('cinema_id', $cinema_id)->with('movie')->whereHas('movie', function($q) {
             $q->where('actived', 1);
         })->get();
