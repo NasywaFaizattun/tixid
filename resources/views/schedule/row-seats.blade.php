@@ -137,7 +137,7 @@
                 service_fee: 4000 * seats.length
                 },
                 success: function(response) {
-                    // kalau berhasil mau ngapain
+                    // kalau berhasil mau ngapai
                 },
                 error: function(message) { // kalau error mau ngapain
                     alert('Gagal membuat data tiket!')

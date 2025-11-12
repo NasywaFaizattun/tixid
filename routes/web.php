@@ -17,6 +17,7 @@ Route::middleware('isUser')->group(function() {
     Route::get('/schedules/{scheduleId}/hours/{hourId}/ticket', [TicketController::class, 'showSeats'])->name('schedules.show_seats');
     Route::prefix('/tickets')->name('tickets.')->group(function() {
         Route::post('/', [TicketController::class, 'store'])->name('store');
+        Route::get('/{ticketId}/order', [TicketController::class, 'ticketOrderPage'])->name('order');
     });
 });
 
