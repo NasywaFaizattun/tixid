@@ -5,18 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-
-class Promo extends Model
+class TicketPayment extends Model
 {
-    //
-
     use SoftDeletes;
-
-    protected $fillable =['promo_code', 'discount', 'type', 'actived'];
+    protected $fillable = ['ticket_id', 'status', 'qrcode', 'booked_date', 'paid_date'];
 
     public function tickets() {
-        return $this->hasMany(Ticket::class);
+        return $this->belongsTo(Ticket::class);
     }
 }
-
-

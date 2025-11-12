@@ -12,7 +12,13 @@ Route::get('/', [MovieController::class, 'home'])->name('home');
 Route::get('/movies/active', [MovieController::class, 'homeMovies'])->name('home.movies.active');
 Route::get('/schedules/{movie_id}', [MovieController::class, 'movieSchedule']
 )->name('schedule.detail');
-Route::get('/schedules/{scheduleId}/hours/{hourId}/ticket', [TicketController::class, 'showSeats'])->name('schedules.show_seats');
+
+Route::middleware('isUser')->group(function() {
+    Route::get('/schedules/{scheduleId}/hours/{hourId}/ticket', [TicketController::class, 'showSeats'])->name('schedules.show_seats');
+    Route::prefix('/tickets')->name('tickets.')->group(function() {
+        Route::post('/', [TicketController::class, 'store'])->name('store');
+    });
+});
 
 // menu "bioskop" pada navbar user (pengguna umum)
 Route::get('/cinemas/list', [CinemaController::class, 'cinemaList'])->name('cinemas.list');
