@@ -31,6 +31,7 @@ class Ticket extends Model
     public function promo() {
         return $this->belongsTo(Promo::class);
     }
+    
     public function ticketPayment() {
         return $this->hasOne(TicketPayment::class);
     }

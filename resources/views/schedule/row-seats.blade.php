@@ -137,7 +137,10 @@
                 service_fee: 4000 * seats.length
                 },
                 success: function(response) {
-                    // kalau berhasil mau ngapai
+                    // kalau berhasil mau ngapain
+                    // window.location.href : redirect halaman lewat js
+                    let ticketId = response.data.id;
+                    window.location.href = `/tickets/${ticketId}/order`;
                 },
                 error: function(message) { // kalau error mau ngapain
                     alert('Gagal membuat data tiket!')

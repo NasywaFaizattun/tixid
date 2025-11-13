@@ -15,9 +15,14 @@ Route::get('/schedules/{movie_id}', [MovieController::class, 'movieSchedule']
 
 Route::middleware('isUser')->group(function() {
     Route::get('/schedules/{scheduleId}/hours/{hourId}/ticket', [TicketController::class, 'showSeats'])->name('schedules.show_seats');
+
     Route::prefix('/tickets')->name('tickets.')->group(function() {
         Route::post('/', [TicketController::class, 'store'])->name('store');
         Route::get('/{ticketId}/order', [TicketController::class, 'ticketOrderPage'])->name('order');
+        // pembuatan barcode pembayaran
+        Route::post('/barcode', [TicketController::class, 'createBarcode'])->name('barcode');
+        // halaman yang nampilin barcode pembayaran
+        Route::get('/{ticketId}/payment', [TicketController::class, 'ticketPaymentPage'])->name('payment.page');
     });
 });
 
