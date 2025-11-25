@@ -78,7 +78,7 @@
                         <a class="nav-link" href="{{ route('cinemas.list') }}">Bioskop</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Tiket</a>
+                        <a class="nav-link" href="{{ route('tickets.index') }}">Tiket</a>
                     </li>
                     @endif
                 </ul>
@@ -117,6 +117,8 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/9.1.0/mdb.umd.min.js"></script>
     {{-- datatables --}}
     <script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+    {{-- chartJs --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     {{-- konten dinamis JS --}}
     @stack('script')

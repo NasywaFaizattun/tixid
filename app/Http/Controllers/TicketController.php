@@ -9,6 +9,9 @@ use App\Models\TicketPayment;
 use Illuminate\Http\Request;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class TicketController extends Controller
 {
@@ -17,7 +20,19 @@ class TicketController extends Controller
         $schedule = Schedule::find($scheduleId);
         //  ambil jam index nya sesuai params route
         $hour = $schedule['hours'][$hourId] ?? ''; // kalau tidak ketemu jam nya, buat default kosong
-        return view('schedule.row-seats', compact('schedule', 'hour'));
+
+        $soldSeats = Ticket::where('schedule_id', $scheduleId)->where('actived', 1)->where('date', now()->format('Y-m-d'))->pluck('rows_of_seats');
+
+        $soldSeatsFormat = [];
+        foreach ($soldSeats as $key => $seat) {
+            // karna $soldSeatss bentuknya 2 dimensi jd loop dua kali simpan ke array diatas untuk data 1 dimensi
+            foreach ($seat as $key => $item) {
+                array_push($soldSeatsFormat, $item);
+            }
+        }
+        // pluck : ambil datanay hanya dari 1 field.column kemudia disatukan di array
+        // dd($soldSeatsFormat);
+        return view('schedule.row-seats', compact('schedule', 'hour', 'soldSeatsFormat'));
     }
 
     /**
@@ -25,7 +40,13 @@ class TicketController extends Controller
      */
     public function index()
     {
-        //
+        $userId = Auth::user()->id;
+        // ambil data ticket berdasarkan data siapa yang login
+        $ticketActive = Ticket::where('user_id', $userId)->where('actived', 1)->where('date', now()->format('Y-m-d'))->get();
+        // ambil data ticket berdasarkan data siapa yang login, yang non-aktif dan sudah kadaluarsa
+        $ticketNonActive = Ticket::where('user_id', $userId)->where('date', '<>', now()->format('Y-m-d'))->get();
+        // '<>' BUKAN SAMA DENGAN
+        return view('ticket.index', compact('ticketActive', 'ticketNonActive'));
     }
 
     /**
@@ -129,12 +150,61 @@ class TicketController extends Controller
         return view('schedule.payment', compact('ticket'));
     }
 
+    public function updateStatusTicket($ticketId)
+    {
+        $updatePayment = TicketPayment::where('ticket_id', $ticketId)->update(['paid_date' => now()]);
+        $updateStatus = Ticket::where('id', $ticketId)->update(['actived' => 1]);
+        // diarahkan ke halaman route (web.php) tickets.show untuk munculin tiket
+        return redirect()->route('tickets.show', $ticketId);
+    }
+
     /**
      * Display the specified resource.
      */
-    public function show(Ticket $ticket)
+    public function show($ticketId)
     {
-        //
+        $ticket = Ticket::where('id', $ticketId)->with(['schedule', 'schedule.movie', 'schedule.cinema', 'ticketPayment'])->first();
+        return view('schedule.ticket', compact('ticket'));
+    }
+
+    public function exportPdf($ticketId)
+    {
+        // siapkan data yang akan ditampilkan di pdf, hasilnya harus bentuk array (toArray())
+        $ticket = Ticket::where('id', $ticketId)->with(['schedule', 'schedule.movie', 'schedule.cinema', 'ticketPayment'])->first()->toArray();
+        // buat nama variavle yang akan di gunakan di blade pdf
+        view()->share('ticket', $ticket);
+        // menentukan file blade yang akan di cetak dan di kirim jg datanya
+        $pdf = Pdf::loadView('schedule.export-pdf', $ticket);
+        // download pdf dengan nama tertentu
+        $filename = 'TICKET' . $ticketId . '.pdf';
+        return $pdf->download($filename);
+    }
+
+    public function dataChart()
+    {
+        // ambil bulan saat ini
+        $month = now()->format('m');
+        // hasil collection (get), dikelompokan berdasarkan booked_date
+        // toArray() : ubah collection menjadi array untuk memudahkan pengambilan data
+        $tickets = Ticket::where('actived', 1)->whereHas('ticketPayment',  function($q) use($month) {
+            $q->whereMonth('booked_date', $month);
+        })->get()->groupBy(function ($ticket) {
+            return Carbon::parse($ticket->ticketPayment->booked_date)->format('Y-m-d');
+        })->toArray();
+        // dd($tickets);
+        // ["tanggal" => array[]]
+        // ambil key dari assod (tanggal)
+        $labels = array_keys($tickets);
+        // siapkan wadah untuk array yang akan berisi angka-angka jumlah data di tgl tesebut
+        $data = [];
+        foreach ($tickets as $ticketGroup) {
+            array_push($data, count($ticketGroup));
+        }
+        // fungsi akan diproses lewat js, kembalikan response bentuk json
+        return response()->json([
+            'labels' => $labels,
+            'data' => $data
+        ]);
     }
 
     /**

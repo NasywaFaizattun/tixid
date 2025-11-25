@@ -340,4 +340,15 @@ class MovieController extends Controller
         return redirect()->back()->with('success', 'Berhasil menghapus seutuhnya!');
     }
 
+    public function chart()
+    {
+        $movieActive = Movie::where('actived', 1)->count();
+        $movieNonActive = Movie::where('actived', 0)->count();
+        // yang diperlukan jumlah data, gunakan count untuk menghitungnya
+        $data = [$movieActive, $movieNonActive];
+        return response()->json([
+            'data' => $data
+        ]);
+    }
+
 }

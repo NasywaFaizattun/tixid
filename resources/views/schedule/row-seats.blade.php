@@ -40,9 +40,18 @@
                             {{-- memberi kotak kosong untuk jarak kursi 6 dan 7 (jalur jalan) --}}
                             <div style="width: 50px;"></div>
                         @endif
-                        <div style="width: 45px; height:45px; text-align: center; font-weight: bold; color: white; padding-top: 10px; cursor: pointer; background: #112646; margin: 5px; border-radius: 8px;"
+                        {{-- in_array('item', $array) :mencari item didalam array --}}
+                        @php
+                            $seat = $row . "-" . $col;
+                        @endphp
+                        @if (in_array($seat, $soldSeatsFormat))
+                            <div style="width: 45px; height:45px; text-align: center; font-weight: bold; color: black; padding-top: 10px; background: #eaeaea; margin: 5px; border-radius: 8px;">
+                            {{ $row }}-{{ $col }}</div>
+                        @else
+                            <div style="width: 45px; height:45px; text-align: center; font-weight: bold; color: white; padding-top: 10px; cursor: pointer; background: #112646; margin: 5px; border-radius: 8px;"
                             onclick="selectSeat('{{ $schedule->price }}', '{{ $row }}', '{{ $col }}', this)">
                             {{ $row }}-{{ $col }}</div>
+                        @endif
                     @endforeach
                 </div>
             @endforeach

@@ -23,6 +23,10 @@ Route::middleware('isUser')->group(function() {
         Route::post('/barcode', [TicketController::class, 'createBarcode'])->name('barcode');
         // halaman yang nampilin barcode pembayaran
         Route::get('/{ticketId}/payment', [TicketController::class, 'ticketPaymentPage'])->name('payment.page');
+        Route::patch('/{ticketId}/payment', [TicketController::class, 'updateStatusTicket'])->name('payment.update');
+        Route::get('/{ticketId}/show', [TicketController::class, 'show'])->name('show');
+        Route::get('/{ticketId}/export/pdf', [TicketController::class, 'exportPdf'])->name('export.pdf');
+        Route::get('/list', [TicketController::class, 'index'])->name('index');
     });
 });
 
@@ -53,6 +57,7 @@ Route::get('/logout', [UserController::class, 'logout'])->name('logout');
 // group() : mengelompokkan route agar mengikuti sifat sebelumnya (sebelumnya = middleware)
 // prefix() -> awalan path. Agar /admin di tulis 1 kali tp digunakan berkali-kali
 Route::middleware('isAdmin')->prefix('/admin')->name('admin.')->group(function(){
+    Route::get('/tickets/chart', [TicketController::class, 'dataChart'])->name('tickets.chart');
     // admin dashboard disimpan dalam group middleware agar dapat menggunakan middleware tsb
     Route::get('/dashboard', function() {
         return view('admin.dashboard');
@@ -95,6 +100,7 @@ Route::middleware('isAdmin')->prefix('/admin')->name('admin.')->group(function()
 
     // data film
     Route::prefix('/movies')->name('movies.')->group(function(){
+        Route::get('/chart', [MovieController::class, 'chart'])->name('chart');
         Route::get('/datatables', [MovieController::class, 'datatables'])->name('datatables');
         Route::get('/', [MovieController::class, 'index'])->name('index');
         Route::get('/create', [MovieController::class, 'create'])->name('create');

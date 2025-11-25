@@ -96,7 +96,7 @@
                 type: "POST",
                 data: data,
                 success: function(response) {
-                    const ticketId = response.data.ticked_id;
+                    const ticketId = response.data.ticket_id;
                     window.location.href = `/tickets/${ticketId}/payment`;
                 },
                 error: function(xhr) {
